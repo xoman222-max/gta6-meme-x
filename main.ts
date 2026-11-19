@@ -18,9 +18,25 @@ import { join } from "node:path";
 const botDir = process.env.MAKEFUN_BOT_DIR ?? "/bot";
 const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 
-const raw = readFileSync(join(botDir, "POST.json"), "utf8");
+let raw: string;
+try {
+  raw = readFileSync(join(botDir, "POST.json"), "utf8");
+} catch (error) {
+  console.error(
+    `POST.json could not be read: ${error instanceof Error ? error.message : String(error)}`,
+  );
+  process.exit(1);
+}
 
-const post: unknown = JSON.parse(raw);
+let post: unknown;
+try {
+  post = JSON.parse(raw);
+} catch (error) {
+  console.error(
+    `POST.json is not valid JSON: ${error instanceof Error ? error.message : String(error)}`,
+  );
+  process.exit(1);
+}
 if (
   typeof post !== "object" ||
   post === null ||
