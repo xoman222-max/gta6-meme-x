@@ -30,5 +30,22 @@ if (
   process.exit(1);
 }
 
+// Fail early with a clear message when the url is not an X post address:
+// the grader refuses a malformed url, so catch it here instead of shipping
+// a POST.json the house cannot read. Accepts x.com / twitter.com, with an
+// optional www. or mobile. prefix, either /<handle>/status/<id> or
+// /i/web/status/<id>, and a query or fragment after the id (read past).
+const url = (post as { url: string }).url;
+if (
+  !/^https:\/\/(www\.|mobile\.)?(x\.com|twitter\.com)\/([^/]+\/status\/\d+|i\/web\/status\/\d+)([?#].*)?$/.test(
+    url,
+  )
+) {
+  console.error(
+    "POST.json url must be an X post address like https://x.com/<handle>/status/<id>",
+  );
+  process.exit(1);
+}
+
 mkdirSync(outputDir, { recursive: true });
 writeFileSync(join(outputDir, "POST.json"), raw);
